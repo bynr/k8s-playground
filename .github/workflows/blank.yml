@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs a single command using the runners shell
+    - name: Run a one-line script
+      run: echo Hello, world!
+
+    # Setup user executables in path
+    - name: Update PATH
+      run: |
+        echo $PATH
+        echo "::add-path::/home/runner/bin"
+
+    # Kubectl is already included in the ubuntu image.
+    - name: Install k3d and argo client
+      run: |
+        cd argo/
+        make install_k3d
+        make install_argo
+
+    - name: Setup local cluster
+      run: |
+        cd argo/
+        make create_cluster
+        make switch_context
+        make install_argo_controller
+        make setup_localstack
+        make get_nodes
+        make get_pods
+        make get_jobs
+        make describe_pods
+        make list
+        argo version
