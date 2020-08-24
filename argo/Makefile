@@ -106,4 +106,4 @@ describe_pods:
 setup_data_fixture:
 	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localhost:31000
 	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localhost:31000
-	aws s3 sync ../data/ s3://test-bucket/ --endpoint-url http://localhost:31000
+	aws s3 sync ../data s3://test-bucket --endpoint-url http://localhost:31000
