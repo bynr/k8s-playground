@@ -14,6 +14,7 @@ spec:
         aws s3 ls --endpoint-url http://localstack:31000 s3://test-bucket
         aws  s3 cp --endpoint-url http://localstack:31000 s3://test-bucket/sample.csv /tmp/sample.csv
         head /tmp/sample.csv
+        cat tettst
       env:
       - name: AWS_ACCESS_KEY_ID
         value: "x"

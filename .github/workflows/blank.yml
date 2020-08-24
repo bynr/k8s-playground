@@ -74,7 +74,7 @@ jobs:
     - name: Run test workflows
       run: |
         cd argo/
-        WF_FILENAME=hello-world-s3.yaml make submit
+        WF_FILENAME=hello-world-s3.yaml make submit || (make logs; make get; exit 1)
         make logs
         make get
         make delete
