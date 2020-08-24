@@ -47,8 +47,9 @@ jobs:
         cd argo/
         make create_cluster
         make switch_context
-        make setup_argo_controller
+        make create_namespace
         make setup_localstack
+        make setup_argo_controller
 
     - name: Check cluster
       run: |

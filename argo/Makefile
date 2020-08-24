@@ -29,8 +29,10 @@ install_argo:
 	mkdir $(HOME)/bin/
 	mv ./argo-linux-amd64 $(HOME)/bin/argo
 
+create_namespace:
+	kubectl create ns $(NAMESPACE)
+
 setup_argo_controller:
-	kubectl create ns argo
 	# Latest config as of 2020-08-23 
 	kubectl apply -n $(NAMESPACE) --wait -f https://raw.githubusercontent.com/argoproj/argo/master/manifests/install.yaml
 	# Modify the containerRuntimeExecutor
