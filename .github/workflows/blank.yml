@@ -21,6 +21,14 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - uses: chrislennon/action-aws-cli@v1.1
+
+    - name: Create empty AWS config
+      run: |
+        aws configure set aws_access_key_id default_access_key
+        aws configure set aws_secret_access_key default_secret_key
+        aws configure set default.region ap-northeast-1
+
     # Setup user executables in path
     - name: Update PATH
       run: |
