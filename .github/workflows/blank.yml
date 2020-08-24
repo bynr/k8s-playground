@@ -1,5 +1,4 @@
 # This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
@@ -22,10 +21,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo Hello, world!
-
     # Setup user executables in path
     - name: Update PATH
       run: |
@@ -44,11 +39,32 @@ jobs:
         cd argo/
         make create_cluster
         make switch_context
-        make install_argo_controller
+        make setup_argo_controller
         make setup_localstack
+
+    - name: Check cluster
+      run: |
+        cd argo/
         make get_nodes
         make get_pods
         make get_jobs
         make describe_pods
-        make list
         argo version
+        make list
+
+    - name: Setup s3 data-fixtures
+      run: |
+        cd argo/
+        make forward_localstack_s3_bg
+        make setup_data_fixture
+
+    - name: Run test workflows
+      run: |
+        WF_FILENAME=hello-world-s3.yaml make submit
+
+    - name: Delete cluster
+      run: |
+        cd argo/
+        make delete_cluster
+
+  

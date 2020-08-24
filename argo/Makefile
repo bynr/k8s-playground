@@ -29,7 +29,7 @@ install_argo:
 	mkdir $(HOME)/bin/
 	mv ./argo-linux-amd64 $(HOME)/bin/argo
 
-install_argo_controller:
+setup_argo_controller:
 	kubectl create ns argo
 	# Latest config as of 2020-08-23 
 	kubectl apply -n $(NAMESPACE) --wait -f https://raw.githubusercontent.com/argoproj/argo/master/manifests/install.yaml
@@ -48,6 +48,9 @@ setup_localstack:
 
 forward_localstack_s3:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000
+
+forward_localstack_s3_bg:
+	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000 &
 
 forward_localstack_aws_ui:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 32000:32000
@@ -77,7 +80,7 @@ submit:
 	argo submit -n $(NAMESPACE) --wait $(WF_FN)
 
 
-# K8s utils
+# kubectl utils
 
 get_nodes:
 	kubectl get nodes
@@ -91,3 +94,8 @@ get_jobs:
 describe_pods:    
 	kubectl -n $(NAMESPACE) describe pods
 
+# S3 utils
+setup_data_fixture:
+	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localstack:31000
+	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localstack:31000
+	aws s3 sync ../data/ s3://test-bucket/ --endpoint-url http://localstack:31000

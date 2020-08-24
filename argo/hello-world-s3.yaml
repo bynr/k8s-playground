@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: hello-world-s3-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+spec:
+  entrypoint: test-1
+  templates:
+  - name: test-1
+    script:
+      image: amazon/aws-cli:latest
+      command: [bash]
+      source: |
+        aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localstack:31000
+        aws s3 ls --endpoint-url http://localstack:31000 s3://test-bucket
+        aws s3 sync --endpoint-url http://localstack:31000 s3://test-bucket /tmp
+        head /tmp/sample.csv
+      env:
+      - name: AWS_ACCESS_KEY_ID
+        value: "x"
+      - name: AWS_SECRET_ACCESS_KEY
+        value: "x"
