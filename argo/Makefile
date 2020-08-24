@@ -55,6 +55,9 @@ forward_localstack_s3_bg:
 forward_localstack_aws_ui:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 32000:32000
 
+wait_localstack:
+	kubectl wait pods --timeout=60s -n $(NAMESPACE) --for=condition=Ready -l app=localstack
+
 # Argo utils
 
 list:     
@@ -77,8 +80,11 @@ delete:
 
 WF_FILENAME ?= hello-world.yaml
 submit:
-	argo submit -n $(NAMESPACE) --wait $(WF_FN)
+	argo submit -n $(NAMESPACE) --wait $(WF_FILENAME)
 
+wait_argo:
+	kubectl wait pods --timeout=60s -n $(NAMESPACE) --for=condition=Ready -l app=argo-server
+	kubectl wait pods --timeout=60s -n $(NAMESPACE) --for=condition=Ready -l app=workflow-controller
 
 # kubectl utils
 
@@ -94,8 +100,10 @@ get_jobs:
 describe_pods:    
 	kubectl -n $(NAMESPACE) describe pods
 
+
 # S3 utils
+
 setup_data_fixture:
-	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localstack:31000
-	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localstack:31000
-	aws s3 sync ../data/ s3://test-bucket/ --endpoint-url http://localstack:31000
+	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localhost:31000
+	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localhost:31000
+	aws s3 sync ../data/ s3://test-bucket/ --endpoint-url http://localhost:31000

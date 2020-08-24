@@ -52,8 +52,11 @@ jobs:
 
     - name: Check cluster
       run: |
+        # Need to wait or else -> error: no matching resources found
+        sleep 10 
         cd argo/
-        sleep 10
+        make wait_argo
+        make wait_localstack
         make get_nodes
         make get_pods
         make get_jobs
@@ -65,10 +68,12 @@ jobs:
       run: |
         cd argo/
         make forward_localstack_s3_bg
+        sleep 2
         make setup_data_fixture
 
     - name: Run test workflows
       run: |
+        cd argo/
         WF_FILENAME=hello-world-s3.yaml make submit
 
     - name: Delete cluster
