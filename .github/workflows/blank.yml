@@ -21,7 +21,7 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - uses: chrislennon/action-aws-cli@v1.1
+    # - uses: chrislennon/action-aws-cli@v1.1
 
     - name: Create empty AWS config
       run: |
@@ -53,6 +53,7 @@ jobs:
     - name: Check cluster
       run: |
         cd argo/
+        sleep 10
         make get_nodes
         make get_pods
         make get_jobs
