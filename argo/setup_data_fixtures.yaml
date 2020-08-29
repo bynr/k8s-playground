@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local-storage
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data-fixtures"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: setup-data-fixture-s3
+spec:
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: amazon/aws-cli:2.0.42
+        command: ["/bin/sh", "-c"]                                                        
+        args:                                                                             
+          - echo "Start";
+            ls -alR /mnt/data;
+            aws configure set aws_access_key_id default_access_key;
+            aws configure set aws_secret_access_key default_secret_key;
+            aws configure set default.region ap-northeast-1;
+            aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localstack:31000;
+            aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localstack:31000;
+            aws s3 sync /mnt/data s3://test-bucket --endpoint-url http://localstack:31000
+        volumeMounts:
+          - mountPath: /mnt/data
+            name: task-pv-storage
+      restartPolicy: Never
+      volumes:
+        - name: task-pv-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+  backoffLimit: 0

@@ -68,9 +68,7 @@ jobs:
     - name: Setup s3 data-fixtures
       run: |
         cd argo/
-        make forward_localstack_s3_bg
-        sleep 2
-        make setup_data_fixture
+        make setup_data_fixture_on_volume
 
     - name: Run test workflows
       run: |

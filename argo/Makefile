@@ -1,3 +1,5 @@
+MAKEFILE_PATH := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+PROJECT_ROOT := $(abspath $(MAKEFILE_PATH)/../)
 NAMESPACE = argo
 LATEST_ARGO_WF = $(shell bash -c  "argo list -n $(NAMESPACE) --no-headers -o name | head -n1")
 
@@ -14,7 +16,8 @@ delete_cluster:
 	k3d cluster delete test-cluster || echo
 
 create_cluster:
-	k3d cluster create test-cluster
+	# Mounts local data directory to /data-fixtures in all nodes (for testing)"
+	k3d cluster create --volume $(PROJECT_ROOT)/data:/data-fixtures@all test-cluster
 
 switch_context:
 	kubectl config use-context k3d-test-cluster
@@ -48,13 +51,13 @@ setup_localstack:
 
 # Localstack utils
 
-forward_localstack_s3:
+forward_s3:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000
 
-forward_localstack_s3_bg:
+forward_s3_bg:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000 &
 
-forward_localstack_aws_ui:
+forward_aws_ui:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 32000:32000
 
 wait_localstack:
@@ -102,10 +105,28 @@ get_jobs:
 describe_pods:    
 	kubectl -n $(NAMESPACE) describe pods
 
-
 # S3 utils
 
-setup_data_fixture:
+setup_data_fixture_on_volume:
+	kubectl apply -n $(NAMESPACE) -f setup_data_fixtures.yaml
+	kubectl get pv -n $(NAMESPACE)
+	kubectl get pvc -n $(NAMESPACE)
+	kubectl describe pv/task-pv-volume -n $(NAMESPACE)
+	kubectl describe pvc/task-pv-claim -n $(NAMESPACE) 
+	kubectl wait --timeout=60s --for=condition=complete jobs/setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl get jobs --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl describe jobs/setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl get pods --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl describe pods --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl logs --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
+	kubectl delete job setup-data-fixture-s3 -n $(NAMESPACE) 
+	# https://github.com/kubernetes/kubernetes/issues/69697
+	# kubectl patch pvc task-pv-claim -p '{"metadata":{"finalizers":null}}' -n $(NAMESPACE) || echo
+	kubectl delete pvc task-pv-claim -n $(NAMESPACE) || echo
+	kubectl delete pv task-pv-volume -n $(NAMESPACE) || echo
+
+
+setup_data_fixture_with_aws_cli:
 	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localhost:31000
 	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localhost:31000
 	aws s3 sync ../data s3://test-bucket --endpoint-url http://localhost:31000
