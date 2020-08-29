@@ -120,6 +120,7 @@ setup_data_fixture_on_volume:
 	kubectl describe pods --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
 	kubectl logs --selector=job-name=setup-data-fixture-s3 -n $(NAMESPACE)
 	kubectl delete job setup-data-fixture-s3 -n $(NAMESPACE) 
+	# If stuck, uncomment line below
 	# https://github.com/kubernetes/kubernetes/issues/69697
 	# kubectl patch pvc task-pv-claim -p '{"metadata":{"finalizers":null}}' -n $(NAMESPACE) || echo
 	kubectl delete pvc task-pv-claim -n $(NAMESPACE) || echo
