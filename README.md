@@ -18,6 +18,7 @@ ___
 - [Argo Workflows: examples](https://argoproj.github.io/argo/examples)
 - [localstack: A fully functional local AWS cloud stack](https://github.com/localstack/localstack)
 - [Github Actions](https://github.com/features/actions)
+- [argo-minikube-github-action](https://github.com/katilp/argo-minikube-github-action)
 
 ### Run
 
