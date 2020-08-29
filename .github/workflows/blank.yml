@@ -47,6 +47,7 @@ jobs:
         cd argo/
         make create_cluster
         make switch_context
+        kubectl cluster-info
         make create_namespace
         make setup_localstack
         make setup_argo_controller
