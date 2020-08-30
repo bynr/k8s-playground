@@ -6,6 +6,8 @@ Expose a service.
 
 ```
 make create_cluster
+make download_images
+make import_images
 make apply
 
 make test
