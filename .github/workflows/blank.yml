@@ -62,8 +62,9 @@ jobs:
         make setup_argo_controller
         # Need to wait or else -> error: no matching resources found
         sleep 20
-        make wait_argo
         make wait_localstack
+        make wait_argo
+        sleep 3
 
     - name: Check cluster
       run: |
