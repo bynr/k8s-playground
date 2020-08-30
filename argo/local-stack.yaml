@@ -15,7 +15,7 @@ spec:
               servicePort: 31000
   tls:
     - hosts:
-      - aws.localhost
+      - s3.localhost
 ---
 apiVersion: v1
 kind: Service
@@ -25,10 +25,6 @@ spec:
   selector:
     app: localstack
   ports:
-  - port: 32000
-    protocol: TCP
-    name: ui
-    nodePort: 32000
   - port: 31000
     protocol: TCP
     name: s3
@@ -55,14 +51,10 @@ spec:
         ports:
         # exposing s3
         - containerPort: 31000
-        # exposing the localstack ui
-        - containerPort: 32000
         env:
             # with the SERVICES environment variable, you can tell LocalStack
             # what services to expose.
           - name: SERVICES
             value: "s3"
-          - name: PORT_WEB_UI
-            value: "32000"
           - name: EDGE_PORT
             value: "31000"
