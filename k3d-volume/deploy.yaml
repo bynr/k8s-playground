@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local-storage
+spec:
+  storageClassName: manual
+  capacity:
+    # Can this be omitted if mounted on hostPath?
+    storage: 20Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/src"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-loop
+spec:
+  selector:
+    matchLabels:
+      app: hello-loop
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-loop
+    spec:
+      containers:
+      - name: pi
+        image: python:3.6-alpine
+        command: ["/bin/sh", "-c"]                                                        
+        args:                                                                             
+          - echo "Start";
+            date;
+            ls -alR /src;
+            python3 -u /src/hello-loop.py;
+            echo "End";
+        volumeMounts:
+          - mountPath: /src
+            name: task-pv-storage
+      volumes:
+        - name: task-pv-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim
