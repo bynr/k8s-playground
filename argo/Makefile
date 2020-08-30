@@ -17,7 +17,7 @@ delete_cluster:
 
 create_cluster:
 	# Mounts local data directory to /data-fixtures in all nodes (for testing)"
-	k3d cluster create --volume $(PROJECT_ROOT)/data:/data-fixtures@all test-cluster
+	k3d cluster create --wait --volume $(PROJECT_ROOT)/data:/data-fixtures@all test-cluster
 
 switch_context:
 	kubectl config use-context k3d-test-cluster
