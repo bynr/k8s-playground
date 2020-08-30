@@ -49,11 +49,11 @@ jobs:
         make switch_context
         make create_namespace
 
-    - name: Download images
-      run: |
-        cd argo/
-        make download_images
-        make import_images
+    # - name: Download images
+    #   run: |
+    #     cd argo/
+    #     make download_images
+    #     make import_images
 
     - name: Setup services
       run: |
