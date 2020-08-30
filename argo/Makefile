@@ -3,6 +3,7 @@ PROJECT_ROOT := $(abspath $(MAKEFILE_PATH)/../)
 NAMESPACE = argo
 LATEST_ARGO_WF = $(shell bash -c  "argo list -n $(NAMESPACE) --no-headers -o name | head -n1")
 
+
 # Setup
 
 install_k3d:
@@ -17,7 +18,11 @@ delete_cluster:
 
 create_cluster:
 	# Mounts local data directory to /data-fixtures in all nodes (for testing)"
-	k3d cluster create --wait --volume $(PROJECT_ROOT)/data:/data-fixtures@all test-cluster
+	k3d cluster create \
+		--wait \
+		--port 5000:80@loadbalancer \
+		--volume $(PROJECT_ROOT)/data:/data-fixtures@all \
+		test-cluster
 
 switch_context:
 	kubectl config use-context k3d-test-cluster
@@ -49,13 +54,16 @@ setup_argo_controller:
 setup_localstack:
 	kubectl apply -n $(NAMESPACE) --wait -f local-stack.yaml
 
+download_images:
+	docker pull localstack/localstack:0.11.4
+
+import_images:
+	k3d image import -c test-cluster localstack/localstack:0.11.4
+
 # Localstack utils
 
 forward_s3:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000
-
-forward_s3_bg:
-	kubectl port-forward deploy/localstack -n $(NAMESPACE) 31000:31000 &
 
 forward_aws_ui:
 	kubectl port-forward deploy/localstack -n $(NAMESPACE) 32000:32000
@@ -107,7 +115,8 @@ describe_pods:
 
 # S3 utils
 
-setup_data_fixture_on_volume:
+# Setup data from local path mounted to nodes and uploaded to s3 in a k8s job. 
+setup_data_fixture_v1:
 	kubectl apply -n $(NAMESPACE) -f setup_data_fixtures.yaml
 	kubectl get pv -n $(NAMESPACE)
 	kubectl get pvc -n $(NAMESPACE)
@@ -127,7 +136,16 @@ setup_data_fixture_on_volume:
 	kubectl delete pv task-pv-volume -n $(NAMESPACE) || echo
 
 
-setup_data_fixture_with_aws_cli:
+# Setup data from local path by uploading data with local aws cli to s3 service 
+# exposed by `kubectl port-forward`
+setup_data_fixture_v2:
 	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://localhost:31000
 	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://localhost:31000
-	aws s3 sync ../data s3://test-bucket --endpoint-url http://localhost:31000
+	aws s3 sync $(PROJECT_ROOT)/data s3://test-bucket --endpoint-url http://localhost:31000
+
+# Setup data from local path by uploading data with local aws cli to s3 service 
+# exposed by ingress
+setup_data_fixture_v3:
+	aws s3api create-bucket --bucket test-bucket --region ap-northeast-1 --endpoint-url http://s3.localhost:5000
+	aws s3api list-buckets --query "Buckets[].Name" --endpoint-url http://s3.localhost:5000
+	aws s3 sync $(PROJECT_ROOT)/data s3://test-bucket --endpoint-url http://s3.localhost:5000

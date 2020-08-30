@@ -47,18 +47,26 @@ jobs:
         cd argo/
         make create_cluster
         make switch_context
-        kubectl cluster-info
         make create_namespace
+
+    - name: Download images
+      run: |
+        make download_images
+        make import_images
+
+    - name: Setup services
+      run: |
         make setup_localstack
         make setup_argo_controller
-
-    - name: Check cluster
-      run: |
         # Need to wait or else -> error: no matching resources found
-        sleep 20 
+        sleep 10 
         cd argo/
         make wait_argo
         make wait_localstack
+
+    - name: Check cluster
+      run: |
+        kubectl cluster-info
         make get_nodes
         make get_pods
         make get_jobs
@@ -69,7 +77,7 @@ jobs:
     - name: Setup s3 data-fixtures
       run: |
         cd argo/
-        make setup_data_fixture_on_volume
+        make setup_data_fixture_v3
 
     - name: Run test workflows
       run: |
