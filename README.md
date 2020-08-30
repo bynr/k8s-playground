@@ -35,5 +35,56 @@ make submit WF_FILENAME=https://raw.githubusercontent.com/argoproj/argo/a24bc944
 ```
 
 ___
+## 2. k3d + localstack + Ingress
+
+### Run
+
+```
+make create_cluster
+make download_images
+make import_images
+make apply
+
+make test
+make upload_to_s3
+```
+
+### TODO
+
+- Expose aws ui at the same time.
+
+___
+## 3. k3d + local path + reload code
+
+Useful for local development without restarting the whole cluster.
+
+### Run
+```
+make create_cluster
+make apply
+make logs
+
+# change src code in src/hello-loop/py
+make restart_container_v2
+make logs
+
+# You will see the code is properly updated in the logs
+```
+
+___
+
+# Other resources
 
 
+- [Principles](https://github.com/ContainerSolutions/kubernetes-examples)
+> The examples seek to be:
+>
+>     As simple as possible to illustrate the functionality
+>
+>     Self-contained (ie limited to one .yaml file)
+>
+>     Non-conflicting (eg resource names are unique)
+>
+>     Clear (eg resource names are verbose and unambiguous)
+- [minikube-vs-kind-vs-k3s](https://brennerm.github.io/posts/minikube-vs-kind-vs-k3s.html)
+- [k3d-demo](https://github.com/iwilltry42/k3d-demo)
