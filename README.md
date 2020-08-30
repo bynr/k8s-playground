@@ -45,13 +45,10 @@ make download_images
 make import_images
 make apply
 
+# To run localstack's web UI, use the image with all dependencies: `localstack-full`.
 make test
 make upload_to_s3
 ```
-
-### TODO
-
-- Expose aws ui at the same time.
 
 ___
 ## 3. k3d + local path + reload code

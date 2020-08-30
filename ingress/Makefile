@@ -17,8 +17,9 @@ wait:
 
 test:
 	kubectl get ingress
-	curl http://s3.localhost:5000 || echo
-	curl http://aws.localhost:5000 || echo
+	kubectl describe ingress
+	curl http://s3.localhost:5000 || echo && echo "\n"
+	(curl http://aws.localhost:5000 | head) || echo && echo "\n"
 
 get_nodes:
 	kubectl get nodes
@@ -36,12 +37,12 @@ upload_to_s3:
 
 download_images:
 	date
-	docker pull localstack/localstack:0.11.4
+	docker pull localstack/localstack-full:0.11.4
 	date
 
 import_images:
 	date
-	k3d image import -c test-cluster localstack/localstack:0.11.4
+	k3d image import -c test-cluster localstack/localstack-full:0.11.4
 	date
 
 forward_s3:

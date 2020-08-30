@@ -13,45 +13,18 @@ spec:
             backend:
               serviceName: localstack
               servicePort: 31000
+    - host: aws.localhost
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: localstack
+              servicePort: 32000
   tls:
     - hosts:
       - aws.localhost
-
+      - s3.localhost
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: localstack
-spec:
-  selector:
-    matchLabels:
-      app: localstack
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: localstack
-    spec:
-      containers:
-      - name: localstack
-        image: localstack/localstack:0.11.4
-        ports:
-        # exposing s3
-        - containerPort: 31000
-        # exposing the localstack ui
-        - containerPort: 32000
-        env:
-            # with the SERVICES environment variable, you can tell LocalStack
-            # what services to expose.
-          - name: SERVICES
-            value: "s3"
-          - name: PORT_WEB_UI
-            value: "32000"
-          - name: EDGE_PORT
-            value: "31000"
-
----
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -69,3 +42,35 @@ spec:
     name: s3
     nodePort: 31000
   type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+spec:
+  selector:
+    matchLabels:
+      app: localstack
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+      - name: localstack
+        image: localstack/localstack-full:0.11.4
+        ports:
+        # exposing s3
+        - containerPort: 31000
+        # exposing the localstack ui
+        - containerPort: 32000
+        env:
+            # with the SERVICES environment variable, you can tell LocalStack
+            # what services to expose.
+          - name: SERVICES
+            value: "s3"
+          - name: PORT_WEB_UI
+            value: "32000"
+          - name: EDGE_PORT
+            value: "31000"
