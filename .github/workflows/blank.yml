@@ -61,7 +61,7 @@ jobs:
         make setup_localstack
         make setup_argo_controller
         # Need to wait or else -> error: no matching resources found
-        sleep 10 
+        sleep 20
         make wait_argo
         make wait_localstack
 
