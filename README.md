@@ -24,6 +24,7 @@ ___
 
 ```bash
 cd argo/
+
 make create_cluster
 make switch_context
 make install_argo_controller
@@ -39,7 +40,9 @@ ___
 
 ### Run
 
-```
+```bash
+cd ingress/
+
 make create_cluster
 make download_images
 make import_images
@@ -56,7 +59,9 @@ ___
 Useful for local development without restarting the whole cluster.
 
 ### Run
-```
+```bash
+cd k3d-volume/
+
 make create_cluster
 make apply
 make logs
