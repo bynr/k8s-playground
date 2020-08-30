@@ -51,21 +51,23 @@ jobs:
 
     - name: Download images
       run: |
+        cd argo/
         make download_images
         make import_images
 
     - name: Setup services
       run: |
+        cd argo/
         make setup_localstack
         make setup_argo_controller
         # Need to wait or else -> error: no matching resources found
         sleep 10 
-        cd argo/
         make wait_argo
         make wait_localstack
 
     - name: Check cluster
       run: |
+        cd argo/
         kubectl cluster-info
         make get_nodes
         make get_pods
