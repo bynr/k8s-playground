@@ -1,4 +1,4 @@
-# k8s-playground
+# k8s-playground :game_die::bowling::soccer:
 
 Personal playground with k8s
 
@@ -6,13 +6,14 @@ ___
 
 ## 1. k3d + argo + localstack + github actions
 
-### Requirements
-    docker
-    kubectl
-    k3d
-    argo (client)
+### Requirements :books:
 
-### Resources
+- docker
+- kubectl
+- k3d
+- argo (client)
+
+### Resources :technologist:
 
 - [k3d: Little helper to run Rancher Lab's k3s in Docker](https://github.com/rancher/k3d)
 - [Argo Workflows: examples](https://argoproj.github.io/argo/examples)
@@ -20,7 +21,7 @@ ___
 - [Github Actions](https://github.com/features/actions)
 - [argo-minikube-github-action](https://github.com/katilp/argo-minikube-github-action)
 
-### Run
+### Run :running:
 
 ```bash
 cd argo/
@@ -36,9 +37,9 @@ make submit WF_FILENAME=https://raw.githubusercontent.com/argoproj/argo/a24bc944
 ```
 
 ___
-## 2. k3d + localstack + Ingress
+## 2. k3d + localstack + Ingress :robot:
 
-### Run
+### Run :running:
 
 ```bash
 cd ingress/
@@ -54,11 +55,11 @@ make upload_to_s3
 ```
 
 ___
-## 3. k3d + local path + reload code
+## 3. k3d + local path + reload code :space_invader:
 
 Useful for local development without restarting the whole cluster.
 
-### Run
+### Run :surfer: 
 ```bash
 cd k3d-volume/
 
@@ -75,7 +76,7 @@ make logs
 
 ___
 
-# Other resources
+# Other resources :book:
 
 
 - [Principles](https://github.com/ContainerSolutions/kubernetes-examples)
