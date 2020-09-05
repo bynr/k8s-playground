@@ -22,6 +22,7 @@ create_cluster:
 		--wait \
 		--verbose \
 		--port 5000:80@loadbalancer \
+		--volume $(PROJECT_ROOT)/data:/data-fixtures@all \
 		test-cluster
 
 switch_context:
