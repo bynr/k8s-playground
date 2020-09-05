@@ -20,6 +20,7 @@ create_cluster:
 	# Mounts local data directory to /data-fixtures in all nodes (for testing)"
 	k3d cluster create \
 		--wait \
+		--verbose \
 		--port 5000:80@loadbalancer \
 		--volume $(PROJECT_ROOT)/data:/data-fixtures@all \
 		test-cluster
