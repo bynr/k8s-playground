@@ -42,6 +42,60 @@ jobs:
             make install_k3d
             make install_argo
 
+      - run:
+          name: Setup local cluster
+          command: |
+            cd argo/
+            make create_cluster
+            make switch_context
+            make create_namespace
+
+      - run:
+          name: Setup services
+          command: |
+            cd argo/
+            make setup_localstack
+            make setup_argo_controller
+            # Need to wait or else -> error: no matching resources found
+            sleep 20
+            make wait_localstack
+            make wait_argo
+            sleep 10
+
+      - run:
+          name: Check cluster
+          command: |
+            cd argo/
+            kubectl cluster-info
+            make get_nodes
+            make get_pods
+            make get_jobs
+            make describe_pods
+            argo version
+            make list
+
+      - run:
+          name: Setup s3 data-fixtures
+          command: |
+            cd argo/
+            make setup_data_fixture_v3
+
+      - run:
+          name: Run test workflows
+          command: |
+            cd argo/
+            WF_FILENAME=hello-world-s3.yaml make submit || (make logs; make get; exit 1)
+            make logs
+            make get
+            make delete
+
+      - run:
+          name: Delete cluster
+          command: |
+            cd argo/
+            make delete_cluster
+
+
   # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
