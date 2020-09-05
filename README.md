@@ -28,7 +28,8 @@ cd argo/
 
 make create_cluster
 make switch_context
-make install_argo_controller
+make create_namespace
+make setup_argo_controller
 make setup_localstack
 
 make submit WF_FILENAME=hello-world.yaml
